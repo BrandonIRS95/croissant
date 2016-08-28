@@ -1,0 +1,6 @@
+[20-Jun-2016 01:13:55 UTC] PHP Warning:  require_once(theme.php): failed to open stream: No such file or directory in /home/ubuntu/workspace/croissant/classes/events.php on line 5
+[20-Jun-2016 01:13:55 UTC] PHP Stack trace:
+[20-Jun-2016 01:13:55 UTC] PHP   1. {main}() /home/ubuntu/workspace/croissant/classes/events.php:0
+[20-Jun-2016 01:13:55 UTC] PHP Fatal error:  require_once(): Failed opening required 'theme.php' (include_path='.:/usr/share/php:/usr/share/pear') in /home/ubuntu/workspace/croissant/classes/events.php on line 5
+[20-Jun-2016 01:13:55 UTC] PHP Stack trace:
+[20-Jun-2016 01:13:55 UTC] PHP   1. {main}() /home/ubuntu/workspace/croissant/classes/events.php:0
