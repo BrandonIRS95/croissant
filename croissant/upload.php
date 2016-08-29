@@ -26,10 +26,10 @@ if ((($_FILES["file"]["type"] == "image/gif")
   if ($_FILES["file"]["error"] > 0) {
     echo "0 a";
   } else {
-    $target = "/home/ubuntu/workspace/croissant-web/web/upload/";
+    $target = "/opt/lampp/htdocs/croissant-web/web/upload/";
     move_uploaded_file($_FILES["file"]["tmp_name"], $target.$_POST['eventid'].'.'.$extension);
-    echo  '{ "src" : "https://croissant-santy-ruler.c9users.io/croissant-web/web/upload/'.$_POST['eventid'].'.'.$extension.'?dummy='.time().'", "name" : "'.$_POST['eventid'].'.'.$extension.'" }';
+    echo  '{ "src" : "upload/'.$_POST['eventid'].'.'.$extension.'?dummy='.time().'", "name" : "'.$_POST['eventid'].'.'.$extension.'" }';
   }
 } else {
-  echo "0 b".$_FILES["file"]["type"]." NO NON ONO NO NO NO NO NO N ON ONON NOON ON ON ONON ONON ON ON ON NO ONO NO NON ON ON NO";
+  echo "0 b".$_FILES["file"]["type"]."NOSE";
 }
