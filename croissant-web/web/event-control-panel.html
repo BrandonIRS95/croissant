@@ -150,6 +150,7 @@
             width: 150px;
             margin-bottom: 20px;
             margin-right: 20px;
+            cursor: pointer;
         }
         
         #conteiner-logo img {
@@ -218,6 +219,24 @@
             margin-top: -15px;
         }
         
+        .toast {
+            position: fixed;
+            border-radius: 3px;
+            bottom: 30px;
+            padding: 15px 20px;
+            background: #292929;
+            box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .toast img{
+            right: 20px;
+        }
+        
+        .toast span
+        {
+            margin-right: 40px;
+        }
+        
     </style>
 </head>
 
@@ -231,7 +250,7 @@
         </div>
     </header>
     <nav>
-        <div id="conteiner-event-info" data-bind="click: showInfoEvent">
+        <div id="conteiner-event-info" data-bind="click: function(item, event) { changeView(showInfoEvent);}">
             <div id="conteiner-event-logo" class="float-left">
                 
             </div>
@@ -239,7 +258,7 @@
                 <div id="title-event" class="float-left" data-bind="text: eventObj.name"></div>
             </div>
         </div>
-        <div data-bind="click: showConferences" id="show-conferences" class="conteiner-nav-option">
+        <div data-bind="click: function() { changeView(showConferences);}" id="show-conferences" class="conteiner-nav-option">
             <img src="Images/ic_account_balance_black_24px.svg">
             <div>Conferences</div>
         </div>
@@ -248,26 +267,18 @@
             <div>Speakers</div>
         </div>
     </nav>
-    <section id="panel-view">
+    <!--<section id="panel-view">
     
-    </section>
-   <!--<section id="panel-view" data-bind="foreach: conferences" class="grid">
-        <div class="form-conteiner conferences-conteiner grid-item">
-            <div class="form-title-conteiner">
-                <h2 data-bind="text: title"></h2>
-                
-            </div>
-            <div class="form-content-conteiner">
-                <h3 style="text-align: left;" data-bind="text: place"></h3>
-                <h5 style="text-align: left;" data-bind="text: date"></h5>
-            </div>
-            <div class="form-buttons-conteiner">
-                <button class="flat-button float-right text-accent">SHOW MORE</button>
-                <div style="clear:both"></div>
-            </div>
-        </div>
     </section>-->
-    <svg style="cursor: pointer;" data-bind="click: showAddElement" id="add-button" fill="" height="80" viewBox="0 0 24 24" width="80" xmlns="http://www.w3.org/2000/svg" class="shadowSvg">
+   <section id="panel-view">
+       
+    </section>
+    
+    <div id="toast-conteiner" class="horizontal-center toast" style="display: none;">
+        <span id="toast-text" class="text-color"></span> <img id="toast-icon" src="Images/ic_done_white_24px.svg" class="vertical-center">
+    </div>
+    
+    <svg style="cursor: pointer; display: none;" data-bind="click: showAddElement" id="add-button" fill="" height="80" viewBox="0 0 24 24" width="80" xmlns="http://www.w3.org/2000/svg" class="shadowSvg">
         <path d="M0 0h24v24H0z" fill="none"/>
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
     </svg>
