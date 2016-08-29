@@ -52,90 +52,87 @@ var vm = function AdministrationViewModel() {
     };
     
     self.showAddElement = function() {
-        $.get("template-add-conference.html", null, function(returnedData){
-            
-                $($.parseHTML(returnedData)).appendTo("body").modal({
-                    escapeClose: false,
-                    clickClose: false,
-                    showClose: false
-                });
-
-                $('#conference-date').datetimepicker({
-                    timepicker:false,
-                    format:'Y/m/d'
-                });
-
-                $('#conference-time').datetimepicker({
-                    datepicker:false,
-                    format: 'H:i'
-                });
-            
-                $("#close-modal").click(function(){
-                    closeModal();    
-                });
-
-                autosize($('#event-description'));
-
-                $("#form-add-conference").validate({
-                    rules: {
-                        title: {
-                            required: true
-                        },
-                        place: {
-                            required: true
-                        },
-                        room: {
-                            required: true
-                        },
-                        date: {
-                            required: true,
-                            date: true
-                        },
-                        time: {
-                            required: true,
-                            time: true
-                        },
-                        type: {
-                            required: true
-                        },
-                        description: {
-                            required: false
-                        }
-                    },
-                    submitHandler: function(form) {
-                        var data = $("#form-add-conference").serializeArray();
-                        data.push({ name: "idevent", value: localStorage.getItem("idevent") });
-                        
-                        $.ajax({
-                           type: "POST",
-                           url: URL_SERVER + 'addconference.php',
-                           data: data
-                        }).done(function(result){
-                            
-                            var item = JSON.parse(result);
-                            
-                            if(item.status === 0)
-                            {
-                                self.conferences.push(new Conference(item.id, item.title, item.type, item.description, item.date, item.time, item.place, item.room));
-                            
-                                $('.grid').masonry("destroy");
-                                $('.grid').masonry({
-                                  itemSelector: '.grid-item'
-                                });
-
-                                closeModal();
-                                self.showToast("Conference added successfully!", "Images/ic_done_white_24px.svg")
-                            }
-                            
-                            
-                        });
-                    }
-                });
-            
-                
-                self.showWindowAnimation($("#conteiner-add-conference"));
-                
+ 
+            $($.parseHTML(self.templateAddConference())).appendTo("body").modal({
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
             });
+
+            $('#conference-date').datetimepicker({
+                timepicker:false,
+                format:'Y/m/d'
+            });
+
+            $('#conference-time').datetimepicker({
+                datepicker:false,
+                format: 'H:i'
+            });
+
+            $("#close-modal").click(function(){
+                closeModal();    
+            });
+
+            autosize($('#event-description'));
+
+            $("#form-add-conference").validate({
+                rules: {
+                    title: {
+                        required: true
+                    },
+                    place: {
+                        required: true
+                    },
+                    room: {
+                        required: true
+                    },
+                    date: {
+                        required: true,
+                        date: true
+                    },
+                    time: {
+                        required: true,
+                        time: true
+                    },
+                    type: {
+                        required: true
+                    },
+                    description: {
+                        required: false
+                    }
+                },
+                submitHandler: function(form) {
+                    var data = $("#form-add-conference").serializeArray();
+                    data.push({ name: "idevent", value: localStorage.getItem("idevent") });
+
+                    $.ajax({
+                       type: "POST",
+                       url: URL_SERVER + 'addconference.php',
+                       data: data
+                    }).done(function(result){
+
+                        var item = JSON.parse(result);
+
+                        if(item.status === 0)
+                        {
+                            self.conferences.push(new Conference(item.id, item.title, item.type, item.description, item.date, item.time, item.place, item.room));
+
+                            $('.grid').masonry("destroy");
+                            $('.grid').masonry({
+                              itemSelector: '.grid-item'
+                            });
+
+                            closeModal();
+                            self.showToast("Conference added successfully!", "Images/ic_done_white_24px.svg")
+                        }
+
+
+                    });
+                }
+            });
+
+
+            self.showWindowAnimation($("#conteiner-add-conference"));
     };
 
     self.eventObj = new EventObj("","","","","","");
@@ -169,106 +166,102 @@ var vm = function AdministrationViewModel() {
     };
     
     self.showInfoEvent = function() {
-        
-        $.get("template-event.html", null, function(returnedData){
             
-            var $panelView = $("#panel-view");
-            var $addButton = $("#add-button");
-            
-            $("body").scrollTop(0);
-            
-            self.downFloatingAnimation($addButton, function() { TweenMax.set($addButton, { y: 0, display: "none", opacity: 1 })});
-            
-            $panelView.html(returnedData);
-            
-            showColors();
-            
-            setColors(self.eventObj.theme.primary_dark, self.eventObj.theme.ascent);
-            
-            $("#conteiner-logo").append("<img src='upload/" + self.eventObj.logo + "'/>");
-            
-            ko.cleanNode($panelView[0]);
-            
-            ko.applyBindings(null, $panelView[0]);
-            
-            ko.cleanNode($("#event-name")[0]);
-            
-            autosize($('#event-description'));
-            
-            self.panelViewAnimation($("#form-conteiner-udpate-event"));
-            
-            $(".form-color-item").on("click", selectColors);
-            
-            $('#conteiner-logo').click(function(){
-                
-                $('#file').trigger('click');
-                
-            });
-            
-            
-            $("#file").change(function(){
-                
-                self.removeLogo();
-                self.uploadLogo();
-                
-            });
-            
-            $('#form-edit-event').validate({
-                ignore: "",
-                rules: {
-                    name: {
-                        required: true
-                    },
-                    description: {
-                        required: true
-                    },
-                    filename: {
-                        required: true
-                    },
-                    eventPrimaryColor: {
-                        required: true
-                    },
-                    eventAccentColor: {
-                        required: true
-                    }
+        var $panelView = $("#panel-view");
+        var $addButton = $("#add-button");
+
+        $("body").scrollTop(0);
+
+        self.downFloatingAnimation($addButton, function() { TweenMax.set($addButton, { y: 0, display: "none", opacity: 1 })});
+
+        $panelView.html(self.templateEvent());
+
+        showColors();
+
+        setColors(self.eventObj.theme.primary_dark, self.eventObj.theme.ascent);
+
+        $("#conteiner-logo").append("<img src='upload/" + self.eventObj.logo + "'/>");
+
+        ko.cleanNode($panelView[0]);
+
+        ko.applyBindings(null, $panelView[0]);
+
+        ko.cleanNode($("#event-name")[0]);
+
+        autosize($('#event-description'));
+
+        self.panelViewAnimation($("#form-conteiner-udpate-event"));
+
+        $(".form-color-item").on("click", selectColors);
+
+        $('#conteiner-logo').click(function(){
+
+            $('#file').trigger('click');
+
+        });
+
+
+        $("#file").change(function(){
+
+            self.removeLogo();
+            self.uploadLogo();
+
+        });
+
+        $('#form-edit-event').validate({
+            ignore: "",
+            rules: {
+                name: {
+                    required: true
                 },
-                messages: {
-                    filename: {
-                        required: 'Please, upload an logo.'
-                    },
-                    eventPrimaryColor: {
-                        required: 'Please, select the primary color.'
-                    },
-                    eventAccentColor: {
-                        required: 'Please, select the accent color.'
-                    }
+                description: {
+                    required: true
                 },
-                submitHandler: function(form) {
-                    
-                    self.updateTheme().done(function(data){
-                        
-                        var jsonResult = JSON.parse(data);
-                        
-                        self.updateEvent(jsonResult.id).done(function(data){
-                            
-                            var resultJson = JSON.parse(data);
-                            
-                            if(resultJson.status === 0) {
-                                
-                                self.setEventInfo(resultJson);
-                                
-                                self.showToast("Event edited successfully!", "Images/ic_done_white_24px.svg");
-                            }
-                            else {
-                                self.showToast("Error: event not edited.", "Images/ic_error_white_24px.svg");
-                            }
-                             
-                        });
-                    });
+                filename: {
+                    required: true
+                },
+                eventPrimaryColor: {
+                    required: true
+                },
+                eventAccentColor: {
+                    required: true
                 }
-            });
-            
-        }); 
+            },
+            messages: {
+                filename: {
+                    required: 'Please, upload an logo.'
+                },
+                eventPrimaryColor: {
+                    required: 'Please, select the primary color.'
+                },
+                eventAccentColor: {
+                    required: 'Please, select the accent color.'
+                }
+            },
+            submitHandler: function(form) {
+
+                self.updateTheme().done(function(data){
+
+                    var jsonResult = JSON.parse(data);
+
+                    self.updateEvent(jsonResult.id).done(function(data){
+
+                        var resultJson = JSON.parse(data);
+
+                        if(resultJson.status === 0) {
+
+                            self.setEventInfo(resultJson);
+
+                            self.showToast("Event edited successfully!", "Images/ic_done_white_24px.svg");
+                        }
+                        else {
+                            self.showToast("Error: event not edited.", "Images/ic_error_white_24px.svg");
+                        }
+
+                    });
+                });
+            }
+        });
     };
     
     self.setEventInfo = function(jsonResult) {
@@ -344,23 +337,18 @@ var vm = function AdministrationViewModel() {
         TweenMax.set($addButton, {clearProps:"all"});
         
         self.upFloatingAnimation($addButton);
-        
-        $.get("template-conferences.html", null, function(returnedData){
             
-            $panelView.html(returnedData);
-            
-            ko.cleanNode($panelView[0]);
-            
-            ko.applyBindings(null, $panelView[0]);
-            
-            $('.grid').masonry({
-              itemSelector: '.grid-item'
-            });
-            
-            self.panelViewAnimation($(".grid-item"));
-            
+        $panelView.html(self.templateConferences());
+
+        ko.cleanNode($panelView[0]);
+
+        ko.applyBindings(null, $panelView[0]);
+
+        $('.grid').masonry({
+          itemSelector: '.grid-item'
         });
-        
+
+        self.panelViewAnimation($(".grid-item"));
     };
     
     self.updateTheme = function() {
@@ -429,6 +417,7 @@ var vm = function AdministrationViewModel() {
         callback();
     };
     
+    
     /* Animations {*/
     
     self.panelViewAnimation = function($child) {
@@ -460,6 +449,126 @@ var vm = function AdministrationViewModel() {
     };
     
     /* } Animations*/
+    
+    
+    
+    /* Templates {*/
+    
+    self.templateConferences = function() {
+      return '<style>\
+        #conteiner-conferences\
+        {\
+            margin-bottom: 130px;\
+        }\
+    </style>\
+    <div id="conteiner-conferences" data-bind="foreach: conferences" class="grid">\
+            <div class="form-conteiner conferences-conteiner grid-item">\
+                <div class="form-title-conteiner">\
+                    <h2 data-bind="text: title"></h2>\
+                </div>\
+                <div class="form-content-conteiner">\
+                    <h3 style="text-align: left;" data-bind="text: place"></h3>\
+                    <h5 style="text-align: left;" data-bind="text: date"></h5>\
+                </div>\
+                <div class="form-buttons-conteiner">\
+                    <button class="flat-button float-right text-accent">SHOW MORE</button>\
+                    <div style="clear:both"></div>\
+                </div>\
+            </div>\
+           </div>';  
+    };
+    
+    self.templateEvent = function () {
+        return '<style>\
+    #save-form-button\
+    {\
+        font-size: 20px;\
+    }\
+</style>\
+<div id="form-conteiner-udpate-event" class="form-conteiner form-event">\
+    <input type="file" name="file" id="file" style="display: none;"/>\
+    <form id="form-edit-event">\
+            <div class="form-title-conteiner">\
+                <h2>Event Manager</h2>\
+            </div>\
+            <div class="form-content-conteiner">\
+                <div id="conteiner-logo">\
+                </div>\
+                <div class="label-event-form">\
+                    Name\
+                </div>\
+                <div class="conteiner-inputs-event">\
+                    <input id="event-name" type="text" class="text-input" name="name" data-bind="value: eventObj.name" autocomplete="off">\
+                </div>\
+                <div style="clear: both;" class="label-event-form">\
+                    Description\
+                </div>\
+                <div class="conteiner-inputs-event">\
+                    <textarea data-bind="value: eventObj.description" name="description" rows="1" id="event-description" class="text-input" autocomplete="off"></textarea>\
+                </div>\
+                <div class="label-event-form">\
+                    <br>Theme<br>\
+                    <input id="event-primary-color" class="text-input" type="text" name="eventPrimaryColor" autocomplete="off" style="display: none;"/>\
+                    <input id="event-accent-color" class="text-input" type="text" name="eventAccentColor" autocomplete="off" style="display: none;"/>\
+                </div>\
+                <div class="conteiner-inputs-event">\
+                    <div id="form-colors-conteiner"></div>\
+                </div>\
+                <div style="clear: both"></div>\
+            </div>\
+            <div class="form-buttons-conteiner">\
+                <button id="save-form-button" type="submit" class="flat-button float-right text-accent">SAVE</button>\
+                <div style="clear:both"></div>\
+            </div>\
+    </form>\
+</div>';
+    };
+    
+    self.templateAddConference = function () {
+        return '<div id="conteiner-add-conference" style="display:none;" class="form-conteiner conferences-conteiner">\
+        <form id="form-add-conference">\
+            <div class="form-title-conteiner">\
+                <h2>Conference Manager</h2>\
+                <h4>Add conference</h4>\
+            </div>\
+            <div class="form-content-conteiner">\
+                <input type="text" name="title" class="text-input" placeholder="Name" autocomplete="off"/>\
+                <div class="conteiner-inputs to-left">\
+                    <input type="text" name="place" class="text-input with-icons" placeholder="Place" autocomplete="off"/>\
+                    <img class="icons-inputs" src="Images/ic_domain_black_24px.svg">\
+                </div>\
+                <div class="conteiner-inputs to-right">\
+                    <input type="text" name="room" class="text-input with-icons" placeholder="Room" autocomplete="off"/>\
+                    <img class="icons-inputs" src="Images/ic_place_black_24px.svg">\
+                </div>\
+                <div class="conteiner-inputs to-left" style="margin-bottom: 10px;">\
+                    <input id="conference-date" type="text" name="date" class="text-input with-icons" placeholder="Date" autocomplete="off"/>\
+                    <img class="icons-inputs" src="Images/ic_event_black_24px.svg">\
+                </div>\
+                <div class="conteiner-inputs to-right" style="margin-bottom: 10px;">\
+                    <input id="conference-time" type="text" name="time" class="text-input with-icons" placeholder="Time" autocomplete="off"/>\
+                    <img class="icons-inputs" src="Images/ic_access_time_black_24px.svg">\
+                </div>\
+                <div class="labels-form">Type</div>\
+                <select type="text" name="type" class="text-input" required>\
+                    <option value=""></option>\
+                    <option value="Conference">Conference</option>\
+                    <option value="Workshop">Workshop</option>\
+                </select>\
+                <div class="labels-form" style="padding-top: 0px;">Description</div>\
+                <textarea name="description" rows="1" id="event-description" class="text-input" autocomplete="off"></textarea>\
+                <div style="clear:both"></div>\
+            </div>\
+            <div class="form-buttons-conteiner">\
+                <a id="close-modal" class="flat-button float-right">CANCEL</a>\
+                <button type="submit" class="flat-button float-right text-accent">SAVE</button>\
+                <div style="clear:both"></div>\
+            </div>\
+        </form>\
+    </div>';
+    };
+    
+    /* } Templates*/
 
     
     self.conferences = ko.observableArray([]);
