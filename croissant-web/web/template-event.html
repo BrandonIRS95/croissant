@@ -1,4 +1,11 @@
-<div class="form-conteiner form-event">
+<style>
+    #save-form-button
+    {
+        font-size: 20px;
+    }
+</style>
+
+<div id="form-conteiner-udpate-event" class="form-conteiner form-event">
     <input type="file" name="file" id="file" style="display: none;"/>
     <form id="form-edit-event">
             <div class="form-title-conteiner">
@@ -13,7 +20,7 @@
                     Name
                 </div>
                 <div class="conteiner-inputs-event">
-                    <input id="event-name" type="text" class="text-input" name="name" data-bind="value: eventObj.name">
+                    <input id="event-name" type="text" class="text-input" name="name" data-bind="value: eventObj.name" autocomplete="off" >
                 </div>
                 <div style="clear: both;" class="label-event-form">
                     Description
@@ -34,7 +41,7 @@
                 <div style="clear: both"></div>
             </div>
             <div class="form-buttons-conteiner">
-                <button type="submit" class="flat-button float-right text-accent">SAVE</button>
+                <button id="save-form-button" type="submit" class="flat-button float-right text-accent">SAVE</button>
                 <div style="clear:both"></div>
             </div>
     </form>
