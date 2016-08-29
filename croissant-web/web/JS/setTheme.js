@@ -17,7 +17,7 @@ $("document").ready(function(){
        console.log(path + " path");
        
        $("#event-name").html(jsonResult.name);
-       $("#event-logo").append('<img src="../web/upload/'+ jsonResult.logo +'" />');
+       $("#event-logo").append('<img src="upload/'+ jsonResult.logo +'" />');
        
        var style = '#header { background: '+ theme.primary_dark +';}\
             #content-menu { background: '+ theme.primary +';}\
@@ -51,8 +51,8 @@ $("document").ready(function(){
             #h1 { color: gray; }';
             
        
-            if(path !== '/croissant-web/web/conferences.html' && path !== '/croissant-web/web/conferences-moderator.html' && path !== '/croissant-web/web/conferences-speaker.html') style += ' #name-speaker { color: gray;} ';
-            if(path !== '/croissant-web/web/conference.html' && path !== '/croissant-web/web/ask_question.html' && path !== '/croissant-web/web/activity_conference.html' && path !== '/croissant-web/web/moderator.html' && path !== "/croissant-web/web/managequestions.html" && path !== '/croissant-web/web/create-trivia.html' && path !== '/croissant-web/web/speaker.html' && path !== '/croissant-web/web/scores.html') style += ' .table-conference { background: '+ theme.primary +'}';
+            if(path !== '/conferences.html' && path !== '/conferences-moderator.html' && path !== '/conferences-speaker.html') style += ' #name-speaker { color: gray;} ';
+            if(path !== '/conference.html' && path !== '/ask_question.html' && path !== '/activity_conference.html' && path !== '/moderator.html' && path !== "/managequestions.html" && path !== '/create-trivia.html' && path !== '/speaker.html' && path !== '/scores.html') style += ' .table-conference { background: '+ theme.primary +'}';
        
         style += ' #div-logout { border-left: 1px solid '+ theme.icons +'}';
        

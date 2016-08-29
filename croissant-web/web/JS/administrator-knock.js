@@ -13,8 +13,7 @@ function Conference(id, title, type, description, date, time, place, room) {
     self.room = room;
 }
 
-function EventObj(id, name, description, logo, theme, admin)
-{
+function EventObj(id, name, description, logo, theme, admin) {
     var self = this;
     self.id = ko.observable(id);
     self.name = ko.observable(name);
@@ -24,11 +23,11 @@ function EventObj(id, name, description, logo, theme, admin)
     self.admin = ko.observable(admin);
 }
 
-function closeModal()
-{
+function closeModal() {
     $("#conteiner-add-conference").remove();
     $(".jquery-modal").remove();
     $(".xdsoft_datetimepicker").remove();
+    $("body").css("overflow-y", "auto");
 }
 
 
@@ -48,10 +47,6 @@ var vm = function AdministrationViewModel() {
             });
             
             self.conferences(mappedConferences);
-            
-            $('.grid').masonry({
-              itemSelector: '.grid-item'
-            });
 
         });
     };
@@ -119,66 +114,88 @@ var vm = function AdministrationViewModel() {
                             
                             var item = JSON.parse(result);
                             
-                            self.conferences.push(new Conference(item.id, item.title, item.type, item.description, item.date, item.time, item.place, item.room));
+                            if(item.status === 0)
+                            {
+                                self.conferences.push(new Conference(item.id, item.title, item.type, item.description, item.date, item.time, item.place, item.room));
                             
-                            $('.grid').masonry("destroy");
-                            $('.grid').masonry({
-                              itemSelector: '.grid-item'
-                            });
+                                $('.grid').masonry("destroy");
+                                $('.grid').masonry({
+                                  itemSelector: '.grid-item'
+                                });
+
+                                closeModal();
+                                self.showToast("Conference added successfully!", "Images/ic_done_white_24px.svg")
+                            }
                             
-                            closeModal();
+                            
                         });
                     }
                 });
+            
+                
+                self.showWindowAnimation($("#conteiner-add-conference"));
+                
             });
     };
 
     self.eventObj = new EventObj("","","","","","");
     
     self.showInfo = function() {
-        
-        var data = { id: localStorage.getItem("idevent") };
 
-        $.get(URL_SERVER + "getEvent.php", data, function(returnedData){
+        if(localStorage.getItem('type') === '1') {
+            
+            var data = { id: localStorage.getItem("idevent") };
 
-            var jsonResult = JSON.parse(returnedData);
-            self.setEventInfo(jsonResult);
-            
-            $("#conteiner-event-logo").append($.parseHTML('<img src="../web/upload/' + jsonResult.logo + '" />'));
-            
-            self.setTheme(jsonResult.theme);
-            
-            $("body").css("display", "inline");
-            
-        });
-        
-        $("#user-name").html(localStorage.getItem("moderatorname"));
+            $.get(URL_SERVER + "getEvent.php", data, function(returnedData){
+
+                var jsonResult = JSON.parse(returnedData);
+
+                self.setEventInfo(jsonResult);
+
+                $("#conteiner-event-logo").append($.parseHTML('<img src="upload/' + jsonResult.logo + '" />'));
+
+                self.setTheme(jsonResult.theme);
+
+                $("body").css("display", "inline");
+
+            });
+
+            $("#user-name").html(localStorage.getItem("moderatorname"));
+        }
+        else {
+            window.location = "presentation.html";
+        }
 
     };
     
-    self.showInfoEvent = function()
-    {
+    self.showInfoEvent = function() {
+        
         $.get("template-event.html", null, function(returnedData){
             
             var $panelView = $("#panel-view");
+            var $addButton = $("#add-button");
             
-            $("#add-button").css("display", "none");
+            $("body").scrollTop(0);
+            
+            self.downFloatingAnimation($addButton, function() { TweenMax.set($addButton, { y: 0, display: "none", opacity: 1 })});
             
             $panelView.html(returnedData);
-            
-            autosize($('#event-description'));
             
             showColors();
             
             setColors(self.eventObj.theme.primary_dark, self.eventObj.theme.ascent);
             
             $("#conteiner-logo").append("<img src='upload/" + self.eventObj.logo + "'/>");
-
+            
             ko.cleanNode($panelView[0]);
             
             ko.applyBindings(null, $panelView[0]);
             
             ko.cleanNode($("#event-name")[0]);
+            
+            autosize($('#event-description'));
+            
+            self.panelViewAnimation($("#form-conteiner-udpate-event"));
             
             $(".form-color-item").on("click", selectColors);
             
@@ -235,8 +252,17 @@ var vm = function AdministrationViewModel() {
                         self.updateEvent(jsonResult.id).done(function(data){
                             
                             var resultJson = JSON.parse(data);
-                            self.setEventInfo(resultJson);
                             
+                            if(resultJson.status === 0) {
+                                
+                                self.setEventInfo(resultJson);
+                                
+                                self.showToast("Event edited successfully!", "Images/ic_done_white_24px.svg");
+                            }
+                            else {
+                                self.showToast("Error: event not edited.", "Images/ic_error_white_24px.svg");
+                            }
+                             
                         });
                     });
                 }
@@ -245,8 +271,7 @@ var vm = function AdministrationViewModel() {
         }); 
     };
     
-    self.setEventInfo = function(jsonResult)
-    {
+    self.setEventInfo = function(jsonResult) {
         var event = self.eventObj;
         event.id(jsonResult.id);
         event.name(jsonResult.name);
@@ -254,10 +279,9 @@ var vm = function AdministrationViewModel() {
         event.logo = jsonResult.logo;
         event.theme = jsonResult.theme;
         event.admin(localStorage.getItem("idadmin"));
-    }
+    };
     
-    self.setTheme = function(theme)
-    {        
+    self.setTheme = function(theme) {        
         var style = '<style> .primary-color { background: '+ theme.primary_dark + ';}\
             .text-accent{ color: ' + theme.primary + '}\
             .text-input:focus { box-shadow: 0 2px 0 ' + theme.primary +';} </style>';
@@ -268,8 +292,7 @@ var vm = function AdministrationViewModel() {
         
     };
     
-    self.uploadLogo = function()
-    {
+    self.uploadLogo = function() {
         var ajax = new XMLHttpRequest();
         var data = new FormData();
         
@@ -300,8 +323,7 @@ var vm = function AdministrationViewModel() {
         ajax.send(data);
     };
     
-    self.removeLogo = function()
-    {
+    self.removeLogo = function() {
         return $.ajax({
           url: URL_SERVER + "removeImage.php",
           type: "POST",
@@ -311,12 +333,37 @@ var vm = function AdministrationViewModel() {
     
     self.showConferences = function() {
         
-        $("#panel-view").empty();
-        $("#add-button").css("display", "inline");
+        var $panelView = $("#panel-view");
+        
+        $panelView.empty();
+        
+        var $addButton = $("#add-button");
+        
+        $addButton.css("display", "inline");
+        
+        TweenMax.set($addButton, {clearProps:"all"});
+        
+        self.upFloatingAnimation($addButton);
+        
+        $.get("template-conferences.html", null, function(returnedData){
+            
+            $panelView.html(returnedData);
+            
+            ko.cleanNode($panelView[0]);
+            
+            ko.applyBindings(null, $panelView[0]);
+            
+            $('.grid').masonry({
+              itemSelector: '.grid-item'
+            });
+            
+            self.panelViewAnimation($(".grid-item"));
+            
+        });
+        
     };
     
-    self.updateTheme = function()
-    {
+    self.updateTheme = function() {
         var primaryPosition = $("#event-primary-color").val();
         var accentPosition = $("#event-accent-color").val();
         var primaryColors = COLORS[primaryPosition].colors;
@@ -336,8 +383,7 @@ var vm = function AdministrationViewModel() {
         });
     };
     
-    self.updateEvent = function()
-    {
+    self.updateEvent = function() {
         var eventData = $("#form-edit-event").serializeArray();
 
         eventData.push({ name: "idTheme", value: self.eventObj.theme.id });
@@ -352,13 +398,75 @@ var vm = function AdministrationViewModel() {
         });
     };
     
+    self.showToast = function(message, srcIcon) {
+        
+        $("#toast-conteiner").remove();
+        
+        var template = '<div id="toast-conteiner" class="horizontal-center toast">\
+            <span id="toast-text" class="text-color">'+ message +'</span> <img id="toast-icon" src="'+ srcIcon +'" class="vertical-center">\
+        </div>';
+        
+        $("body").append(template);
+        
+        var $toastConteiner = $("#toast-conteiner");
+        var $icon = $("#toast-icon");
+        
+        TweenMax.set($icon, { scale: 0})
+        TweenMax.to($icon, 0.3, { rotation: 360, scale: 1, delay: 0.3, force3D:false, onComplete: function() { TweenMax.set($icon, {rotation: 0});}});
+        self.upFloatingAnimation($toastConteiner, function() {
+            self.fadeAnimation($toastConteiner, 2);
+        });
+    };
+    
+    self.changeView = function(callback) {
+        
+        var $toast = $("#toast-conteiner");
+        
+        TweenMax.killTweensOf($toast);
+        
+        self.downFloatingAnimation($toast, function(){ $toast.remove();});
+        
+        callback();
+    };
+    
+    /* Animations {*/
+    
+    self.panelViewAnimation = function($child) {
+        
+        var $body = $("body");
+        $body.css("overflow-x","hidden");
+        TweenMax.from($child, 0.5, {x: 500, ease: Power3.easeOut});
+        TweenMax.from($child, 0.6, {opacity: 0});
+    };
+    
+    self.upFloatingAnimation = function($element, callback) {
+        TweenMax.from($element, 0.8, { y: 50, ease: Elastic.easeOut.config(1, 0.4), onComplete: function() { typeof callback === 'function' && callback(); } });
+        TweenMax.from($element, 0.6, { opacity: 0});
+    };
+    
+    self.downFloatingAnimation = function($element, callback) {
+        TweenMax.to($element, 0.5, { y: 50, ease: Back.easeInOut.config(1.7), onComplete: function() {
+            callback();
+        } });
+        TweenMax.to($element, 0.3, { opacity: 0});
+    };
+    
+    self.fadeAnimation = function($element, delay) {
+        TweenMax.to($element, 2, {opacity: 0, delay: delay, onComplete: function(){ $element.remove();}})
+    };
+    
+    self.showWindowAnimation = function($element) {
+        TweenMax.from($element, 0.5, {scale: 0.5, ease: Power3.easeOut});
+    };
+    
+    /* } Animations*/
+
+    
     self.conferences = ko.observableArray([]);
+    
     self.showInfo();
     self.getConferences();
     
 }
-/*ko.utils.domNodeDisposal.cleanExternalData = function () {
-    // Do nothing. Now any jQuery data associated with elements will
-    // not be cleaned up when the elements are removed from the DOM.
-};*/
+
 ko.applyBindings(vm);
